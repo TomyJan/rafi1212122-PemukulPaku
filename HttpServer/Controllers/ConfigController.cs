@@ -1,6 +1,9 @@
 ﻿using Common;
 using HttpServer.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HttpServer.Controllers
 {
@@ -242,6 +245,31 @@ namespace HttpServer.Controllers
                             third_proto = ""
                         }
                     }
+                });
+            });
+
+            app.UseDefaultFiles(); // 添加默认文件中间件
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory()), // 设置文件提供程序为当前目录
+                ContentTypeProvider = new FileExtensionContentTypeProvider(), // 设置内容类型提供程序
+            });
+
+            app.Map("/", (ctx) =>
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "index.html"); // 获取index.html的完整路径
+                ctx.Response.ContentType = "text/html; charset=utf-8";
+                if (File.Exists(filePath))
+                    return ctx.Response.SendFileAsync(filePath); // 发送文件作为响应
+                else
+                    return ctx.Response.WriteAsync("Welcome to TomyJan Server!"); ;
+            });
+
+            app.Map("/sdk/dataUpload", (ctx) =>
+            {
+                return ctx.Response.WriteAsJsonAsync(new
+                {
+                    code = 0
                 });
             });
 #pragma warning restore CS8600, CS8602 // Converting null literal or possible null value to non-nullable type.
