@@ -10,8 +10,13 @@ namespace Common
         public static readonly IConfig config = new ConfigurationBuilder<IConfig>().UseJsonFile("config.json").Build();
         public static readonly Logger c = new("Global");
 
-        public static readonly MongoClient MongoClient = new(config.DatabaseUri);
-        public static readonly IMongoDatabase db = MongoClient.GetDatabase("PemukulPaku");
+        public static readonly MongoClient MongoClient = new MongoClient(
+            new MongoClientSettings
+            {
+                Server = new MongoServerAddress(config.Database.Host, config.Database.Port),
+                Credential = MongoCredential.CreateCredential("admin", config.Database.Username, config.Database.Password)
+            });
+        public static readonly IMongoDatabase db = MongoClient.GetDatabase(config.Database.Name);
         public static long GetUnixInSeconds() => ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
         public static uint GetRandomSeed() => (uint)(GetUnixInSeconds() * new Random().Next(1, 10) / 10);
     }
@@ -27,8 +32,23 @@ namespace Common
         [Option(DefaultValue = true)]
         bool CreateAccountOnLoginAttempt { get; set; }
 
-        [Option(DefaultValue = "mongodb://127.0.0.1:27017/PemukulPaku")]
-        string DatabaseUri { get; set; }
+        IDatabase Database { get; set; }
+
+        public interface IDatabase
+        {
+            [Option(DefaultValue = "127.0.0.1")]
+            string Host { get; set; }
+
+            [Option(DefaultValue = 27017)]
+            int Port { get; set; }
+            
+            [Option(DefaultValue = "PemukulPaku")]
+            string Name { get; set; }
+
+
+            string Username { get; set; }
+            string Password { get; set; }
+        }
 
         [Option]
         IGameserver Gameserver { get; set; }
