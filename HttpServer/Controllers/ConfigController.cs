@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using static System.Net.Mime.MediaTypeNames;
+using System;
 
 namespace HttpServer.Controllers
 {
@@ -265,11 +266,17 @@ namespace HttpServer.Controllers
                     return ctx.Response.WriteAsync("Welcome to TomyJan Server!"); ;
             });
 
-            app.Map("/sdk/dataUpload", (ctx) =>
+            app.Map("/status/server", (ctx) =>
             {
                 return ctx.Response.WriteAsJsonAsync(new
                 {
-                    code = 0
+                    retcode= 0,
+                    status = new
+                    {
+                        playerCount = -1,
+                        maxPlayer = -1,
+                        version = "6.6OS_TomyJan"
+                    }
                 });
             });
 #pragma warning restore CS8600, CS8602 // Converting null literal or possible null value to non-nullable type.
