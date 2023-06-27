@@ -50,7 +50,7 @@ namespace HttpServer.Controllers
                         protocol = true,
 			            qr_enabled = false,
 			            log_level = "DEBUG",
-			            announce_url = $"https://{Global.config.Gameserver.Host}/bh3/announcement/",
+			            announce_url = $"https://{Global.config.Gameserver.Host}:{Global.config.Http.HttpsPort}/bh3/announcement/",
 			            push_alias_type = 2,
 			            disable_ysdk_guard = false,
 			            enable_announce_pic_popup = false,
