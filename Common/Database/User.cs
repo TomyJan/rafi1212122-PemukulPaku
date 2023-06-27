@@ -64,6 +64,11 @@ namespace Common.Database
             return user;
         }
 
+        public static bool NameExisted(string name)
+        {
+            return collection.AsQueryable().Any(d => d.Name == name);
+        }
+
     }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

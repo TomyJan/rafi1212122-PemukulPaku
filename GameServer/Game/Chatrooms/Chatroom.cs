@@ -104,7 +104,7 @@ namespace PemukulPaku.GameServer.Game.Chatrooms
             ChatMsg AiMsg = new()
             {
                 Uid = 0,
-                Nickname = "Ai-chan",
+                Nickname = "TomyJan",
                 Time = (uint)Global.GetUnixInSeconds(),
                 Msg = msg,
                 Content = new() { },

@@ -2,6 +2,8 @@
 using HttpServer.Models;
 using Common.Database;
 using Newtonsoft.Json.Linq;
+using Common;
+using Common.Utils;
 
 namespace HttpServer.Controllers
 {
@@ -118,47 +120,92 @@ namespace HttpServer.Controllers
                 StreamReader Reader = new(ctx.Request.Body);
                 ShieldLoginBody Data = JsonConvert.DeserializeObject<ShieldLoginBody>(Reader.ReadToEndAsync().Result);
 
-                UserScheme user = User.FromName(Data.Account);
-
-                ShieldLoginResponse rsp = new()
+                UserScheme user;
+                ShieldLoginResponse rsp;
+                if (!User.NameExisted(Data.Account)) // 用户不存在
                 {
-                    Retcode = 0,
-                    Message = "OK",
-                    Data = new()
+                    if(!Global.config.CreateAccountOnLoginAttempt) // 关闭了自动注册
                     {
-                        Account = new()
+                        rsp = new()
                         {
-                            Uid = user.Uid,
-                            Name = user.Name,
-                            Email = "",
-                            Mobile = "",
-                            IsEmailVerify = "0",
-                            Realname = "",
-                            IdentityCard = "",
-                            Token = user.Token.ToString(),
-                            SafeMobile = "",
-                            FacebookName = "",
-                            GoogleName = "",
-                            TwitterName = "",
-                            GameCenterName = "",
-                            AppleName = "",
-                            SonyName = "",
-                            TapName = "",
-                            Country = "**",
-                            ReactivateTicket = "",
-                            AreaCode = "**",
-                            DeviceGrantTicket = "",
-                            SteamName = "",
-                            UnmaskedEmail = "",
-                            UnmaskedEmailType = 0
-                        },
-                        DeviceGrantRequired = false,
-                        SafeMoblieRequired = false,
-                        RealpersonRequired = false,
-                        ReactivateRequired = false,
-                        RealnameOperation = "None"
+                            Retcode = -107,
+                            Message = "用户不存在",
+                            Data = new()
+                            { }
+                        };
                     }
-                };
+                    else
+                    {
+                        //
+                        if (Global.config.MinEntropyOfAutoCreate > 0 && Misc.CalculateEntropy(Data.Account) > Global.config.MinEntropyOfAutoCreate) // 复杂度满足
+                        {
+                            user = User.FromName(Data.Account);
+                            rsp = new()
+                            {
+                                Retcode = -107,
+                                Message = "成功注册账号" + Data.Account + ", 再次点击以登录",
+                                Data = new()
+                                { }
+                            };
+                        }
+                        else // 账号复杂度不满足
+                        {
+                            rsp = new()
+                            {
+                                Retcode = -107,
+                                Message = "账号创建失败: 复杂度太低 (" + Misc.CalculateEntropy(Data.Account).ToString("F2") + "/" + Global.config.MinEntropyOfAutoCreate.ToString("F2") + "), 请重试",
+                                Data = new()
+                                { }
+                            };
+                        }
+                    }
+
+                    
+                    
+                }   
+                else
+                {
+                    user = User.FromName(Data.Account);
+                    rsp = new()
+                    {
+                        Retcode = 0,
+                        Message = "OK",
+                        Data = new()
+                        {
+                            Account = new()
+                            {
+                                Uid = user.Uid,
+                                Name = user.Name,
+                                Email = "",
+                                Mobile = "",
+                                IsEmailVerify = "0",
+                                Realname = "",
+                                IdentityCard = "",
+                                Token = user.Token.ToString(),
+                                SafeMobile = "",
+                                FacebookName = "",
+                                GoogleName = "",
+                                TwitterName = "",
+                                GameCenterName = "",
+                                AppleName = "",
+                                SonyName = "",
+                                TapName = "",
+                                Country = "**",
+                                ReactivateTicket = "",
+                                AreaCode = "**",
+                                DeviceGrantTicket = "",
+                                SteamName = "",
+                                UnmaskedEmail = "",
+                                UnmaskedEmailType = 0
+                            },
+                            DeviceGrantRequired = false,
+                            SafeMoblieRequired = false,
+                            RealpersonRequired = false,
+                            ReactivateRequired = false,
+                            RealnameOperation = "None"
+                        }
+                    };
+                }
 
                 ctx.Response.Headers.Add("Content-Type", "application/json");
 

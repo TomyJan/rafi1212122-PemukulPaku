@@ -32,6 +32,9 @@ namespace Common
         [Option(DefaultValue = true)]
         bool CreateAccountOnLoginAttempt { get; set; }
 
+        [Option(DefaultValue = 2.5)]
+        double MinEntropyOfAutoCreate { get; set; }
+
         IDatabase Database { get; set; }
 
         public interface IDatabase
