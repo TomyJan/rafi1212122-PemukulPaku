@@ -26,7 +26,7 @@ namespace Common.Utils.ExcelReader
 
         public void Load()
         {
-            All = JsonConvert.DeserializeObject<Scheme[]>(File.ReadAllText($"Resources\\ExcelOutputAsset\\{FileName}")) ?? Array.Empty<Scheme>();
+            All = JsonConvert.DeserializeObject<Scheme[]>(File.ReadAllText($"Resources/ExcelOutputAsset/{FileName}")) ?? Array.Empty<Scheme>();
         }
 #pragma warning restore CS8618, CS8602 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     }

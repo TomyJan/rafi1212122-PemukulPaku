@@ -14,7 +14,7 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Resources\ExcelOutputAsset\**">
+		<Content Include="Resources/ExcelOutputAsset/**">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
